@@ -49,29 +49,25 @@ your current user agent/OS/device, or for any arbitrary user agent string.
 Usage :: [node.js][1]
 ---------------------
 ```js
-var http = require('http');
+var r = require('ua-parser').parse(navigator.userAgent);
 
-http.createServer(function (req, res) {
+console.log(r.ua.toString());        // -> "Safari 5.0.1"
+console.log(r.ua.toVersionString()); // -> "5.0.1"
+console.log(r.ua.family)             // -> "Safari"
+console.log(r.ua.major);             // -> "5"
+console.log(r.ua.minor);             // -> "0"
+console.log(r.ua.patch);             // -> "1"
 
-  var r = require('ua-parser').parse(req.headers['user-agent']);
+console.log(r.os.toString());        // -> "iOS 5.1"
+console.log(r.os.toVersionString()); // -> "5.1"
+console.log(r.os.family)             // -> "iOS"
+console.log(r.os.major);             // -> "5"
+console.log(r.os.minor);             // -> "1"
+console.log(r.os.patch);             // -> null
 
-  console.log(r.ua.toString());        // -> "Safari 5.0.1"
-  console.log(r.ua.toVersionString()); // -> "5.0.1"
-  console.log(r.ua.family)             // -> "Safari"
-  console.log(r.ua.major);             // -> "5"
-  console.log(r.ua.minor);             // -> "0"
-  console.log(r.ua.patch);             // -> "1"
-
-  console.log(r.os.toString());        // -> "iOS 5.1"
-  console.log(r.os.toVersionString()); // -> "5.1"
-  console.log(r.os.family)             // -> "iOS"
-  console.log(r.os.major);             // -> "5"
-  console.log(r.os.minor);             // -> "1"
-  console.log(r.os.patch);             // -> null
-
-  console.log(r.device.family);        // -> "iPhone"
-
-}).listen(3000);
+console.log(r.device.family);        // -> "iPhone"
+console.log(r.device.brand);         // -> "Apple"
+console.log(r.device.model);         // -> "iPhone"
 ```
 
 Note if you're only interested in one of the `ua`, `device` or `os` objects, you will getter better performance by using the more specific methods (`uaParser.parseUA`, `uaParser.parseOS` and `uaParser.parseDevice` respectively), e.g.:
@@ -123,7 +119,7 @@ print result_dict['os']
 # {'major': '5', 'patch_minor': None, 'minor': '1', 'family': 'iOS', 'patch': None}
 
 print result_dict['device']
-# {'family': 'iPhone'}
+# {'family': 'iPhone', 'brand': 'Apple', 'model': 'iPhone'}
 ```
 
 
@@ -227,36 +223,41 @@ Usage :: php
 require_once 'vendor/autoload.php';
 use UAParser\Parser;
 
-$ua = "Mozilla/5.0 (Macintosh; Intel Ma...";
+$ua = "Mozilla/5.0 (iPod; CPU iPhone OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Mobile/9B176";
 
 $parser = Parser::create();
 $result = $parser->parse($ua);
 
-print $result->ua->family;            // Safari
-print $result->ua->major;             // 6
-print $result->ua->minor;             // 0
-print $result->ua->patch;             // 2
-print $result->ua->toString();        // Safari 6.0.2
-print $result->ua->toVersion();       // 6.0.2
-
-print $result->os->family;            // Mac OS X
-print $result->os->major;             // 10
-print $result->os->minor;             // 7
-print $result->os->patch;             // 5
-print $result->os->patchMinor;        // [null]
-print $result->os->toString();        // Mac OS X 10.7.5
-print $result->os->toVersion();       // 10.7.5
-
-print $result->device->family;        // Other
-
-print $result->toString();            // Safari 6.0.2/Mac OS X 10.7.5
-print $result->uaOriginal;            // Mozilla/5.0 (Macintosh; Intel Ma...
+print $result->ua->family ."\n";        // Mobile Safari
+print $result->ua->major ."\n";         // 5
+print $result->ua->minor ."\n";         // 1
+print $result->ua->patch ."\n";         // 
+print $result->ua->toString() ."\n";    // Mobile Safari 5.1
+print $result->ua->toVersion() ."\n";   // 5.1
+    
+print $result->os->family ."\n";        // iOS
+print $result->os->major ."\n";         // 5
+print $result->os->minor ."\n";         // 
+print $result->os->patch ."\n";         // 
+print $result->os->patchMinor ."\n";    // 
+print $result->os->toString() ."\n";    // iOS 5.1
+print $result->os->toVersion() ."\n";   // 5.1
+    
+print $result->device->family ."\n";    // iPod
+print $result->device->brand ."\n";     // Apple
+print $result->device->model ."\n";     // iPod
+    
+print $result->toString() ."\n";        // Mobile Safari 5.1/iOS 5.1
+print $result->originalUserAgent ."\n"; // Mozilla/5.0 (iPod; CPU iPhone ...
 ```
 
 [More information is available in the README](https://github.com/tobie/ua-parser/tree/master/php) in the PHP directory
 
 Usage :: D
 -------------
+
+**NOTE: This parser does not yet support brand-model parsing of `regexes.yaml` and therefore relies on `regexes_outdated.yaml` file**
+
 ```d
 import UaParser;
 
@@ -289,6 +290,9 @@ void main() {
 
 Usage :: C#
 -------------
+
+**NOTE: This parser does not yet support brand-model parsing of `regexes.yaml` and therefore relies on `regexes_outdated.yaml` file**
+
 Install the NuGet package
 
 	Install-Package UAParser
@@ -341,12 +345,19 @@ print $r->os->minor;              # -> "1"
 print $r->os->patch;              # -> undef
 
 print $r->device->family;         # -> "iPhone"
+print $r->device->brand;          # -> "Apple"
+print $r->device->model;          # -> "iPhone"
 
-More information is available in the README in the perl directory
 ```
+[More information is available in the README](https://github.com/tobie/ua-parser/tree/master/perl)
 
 Usage :: Haskell
 ---------------
+
+**NOTE: This parser does not yet support brand-model parsing of `regexes.yaml` and therefore relies on `regexes_outdated.yaml` file**
+
+```haskell
+{-
 
 Install the package:
 
@@ -383,6 +394,8 @@ Please refer to Haddocks for more info; the API is pretty straightforward.
 
 Usage :: Go
 ------------
+
+**NOTE: This parser does not yet support brand-model parsing of `regexes.yaml` and therefore relies on `regexes_outdated.yaml` file**
 
 Install the package:
 

@@ -214,8 +214,12 @@ instance FromJSON OSParser where
 
 
 -------------------------------------------------------------------------------
-instance FromJSON DevParser where
-    parseJSON (Object v) =
-      DevParser <$> parseRegex v
-                <*> v .:? "device_replacement"
-    parseJSON _ = error "Object expected when parsing JSON"
+-- | Load a user agent string parser state, ready to be used with one
+-- of the parsing functions.
+--
+-- This function will load the YAML parser definitions stored in
+-- package's cabal 'getDataDir'.
+loadUAParser :: IO UAConfig
+loadUAParser = do
+  dir <- getDataDir
+  loadConfig $ dir </> "../regexes_outdated.yaml"
